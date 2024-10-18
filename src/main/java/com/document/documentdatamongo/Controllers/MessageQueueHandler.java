@@ -19,24 +19,36 @@ public class MessageQueueHandler {
         this.service = service;
     }
 
-    @RabbitListener(queues = "SecondQueue")
+    @RabbitListener(queues = "MongoQueue")
     public void receiveDocument(DocumentDTO documentDTO) {
         try{
             if (documentDTO != null){
                 service.add(documentDTO);
                 System.out.println("Success " + documentDTO.getFileName());
-                sendMessage("FirstOkQueue", "Done");
+                sendMessage("StatusDataQueue", "Done");
             } else{
-                sendMessage("FirstBadQueue", "Model is null");
-                System.out.println("Error ");
+                sendMessage("StatusDataQueue", "Model is null");
+                System.out.println("Error model is null");
             }
         } catch (Exception ex){
             System.out.println("Error from receiveDocument: " + ex);
-            sendMessage("FirstBadQueue", "Error");
+            sendMessage("StatusDataQueue", "Error");
         }
     }
-
-    private void sendMessage(String nameQueue, String status){
+    @RabbitListener(queues = "StatusMongoQueue")
+    public void receiveStatus(String status) {
+        try{
+            if(status.equals("Done")) {
+                System.out.println("Status success");
+            } else {
+                System.out.println("Status bad");
+                sendMessage("StatusDataQueue", "Bad");
+            }
+        } catch (Exception ex){
+            sendMessage("StatusDataQueue", "ErrorReceiveStatus");
+        }
+    }
+        private void sendMessage(String nameQueue, String status){
         rabbitTemplate.convertAndSend(nameQueue, status);
     }
 

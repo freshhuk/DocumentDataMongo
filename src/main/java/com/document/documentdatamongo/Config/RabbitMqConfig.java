@@ -1,5 +1,6 @@
 package com.document.documentdatamongo.Config;
 
+import lombok.Setter;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -8,11 +9,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+
 @Configuration
 public class RabbitMqConfig {
 
     @Value("${queue.name}")
-    private String queueName;
+    private String statusQueueName;
+    @Value("${queueSecond.name}")
+    private String mongoQueueName;
+    @Value("${queueData.name}")
+    private String statusDataQueue;
+
 
     @Value("${spring.rabbitmq.username}")
     private String queueUserName;
@@ -21,10 +28,17 @@ public class RabbitMqConfig {
     private String queuePassword;
 
     @Bean
-    public Queue queue(){
-        return new Queue(queueName, false);
+    public Queue queueStatusMongo(){
+        return new Queue(statusQueueName, false);
     }
-
+    @Bean
+    public Queue queueStatusData(){
+        return new Queue(statusDataQueue, false);
+    }
+    @Bean
+    public Queue queueMongo(){
+        return new Queue(mongoQueueName, false);
+    }
     @Bean
     public CachingConnectionFactory connectionFactory(){
         CachingConnectionFactory connection = new CachingConnectionFactory("localhost");
