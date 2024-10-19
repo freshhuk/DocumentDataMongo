@@ -1,6 +1,6 @@
 package com.document.documentdatamongo.Config;
 
-import lombok.Setter;
+
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
