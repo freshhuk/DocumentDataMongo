@@ -20,7 +20,7 @@ public class DataService {
 
     public void add(DocumentDTO documentDTO) {
         try{
-            if (shouldCreateNewDocument(documentDTO)) {
+            if (!repository.existsByName(documentDTO.getFileName())) {
 
                 LocalDate currentDate = LocalDate.now();
 
@@ -39,7 +39,7 @@ public class DataService {
                 updateDocument(documentDTO);
             }
         } catch (Exception ex){
-            System.out.println("Error from dd method");
+            System.out.println("Error from add method" + ex);
         }
     }
     private void updateDocument(DocumentDTO doc) {
@@ -55,11 +55,4 @@ public class DataService {
         }
     }
 
-    private boolean shouldCreateNewDocument(DocumentDTO doc) {
-        if (!repository.existsByName(doc.getFileName())) {
-            String lastFourCharacters = doc.getFileName().substring(doc.getFileName().length() - 5);
-            return lastFourCharacters.equals(".docx");
-        }
-        return false;
-    }
 }
