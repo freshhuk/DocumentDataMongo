@@ -3,6 +3,8 @@ package com.document.documentdatamongo.Services;
 import com.document.documentdatamongo.Domain.Entities.DocumentModel;
 import com.document.documentdatamongo.Domain.Models.DocumentDTO;
 import com.document.documentdatamongo.Repositories.DataRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,7 @@ import java.time.LocalDate;
 public class DataService {
 
     private final DataRepository repository;
+    private final static Logger logger = LoggerFactory.getLogger(DataService.class);
 
     @Autowired
     public DataService(DataRepository repository){
@@ -35,11 +38,13 @@ public class DataService {
                 document.setIdUserModify(1);//todo
 
                 repository.save(document);
+                logger.info("Entity was added in db");
             } else {
+                logger.info("Entity was updated in db");
                 updateDocument(documentDTO);
             }
         } catch (Exception ex){
-            System.out.println("Error from add method" + ex);
+            logger.error("Error from add method" + ex);
         }
     }
     private void updateDocument(DocumentDTO doc) {
@@ -51,7 +56,7 @@ public class DataService {
 
             repository.save(document);
         } catch (Exception ex) {
-            System.out.println("Error in updateDocument method " + ex);
+            logger.error("Error in updateDocument method " + ex);
         }
     }
 
