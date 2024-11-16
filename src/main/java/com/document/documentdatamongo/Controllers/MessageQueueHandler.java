@@ -30,50 +30,57 @@ public class MessageQueueHandler {
     }
 
     @RabbitListener(queues = "MongoQueue")
-    public void receiveDocument(MessageWrapper documentDTO) {
+    public void receiveDocument(MessageWrapper<DocumentDTO> documentDTO) {
         try{
-            DocumentDTO entity = (DocumentDTO) documentDTO.getPayload();
+            DocumentDTO entity = documentDTO.getPayload();
+            System.out.println(entity);
+            MessageWrapper<DocumentDTO> sentModel;
+            MessageWrapper<MessageWrapper<DocumentDTO>> message;// Заместь вложеного просто создать новую модель с новыми полями которые
+           // включают все не обходимое потом настроить его в приемнеке новой дизенчтото там и все
 
-            MessageWrapper message;
+
             if (entity != null){
-                message = new MessageWrapper(MessageAction.UPLOAD.toString(), QueueStatus.DONE.toString());
+                sentModel = new MessageWrapper<>(QueueStatus.DONE.toString(), entity);
+                message = new MessageWrapper<>(MessageAction.UPLOAD.toString(), sentModel);
 
                 service.add(entity);
                 logger.info("Success " + entity.getFileName());
 
             } else{
-
-                message = new MessageWrapper(MessageAction.UPLOAD.toString(), QueueStatus.BAD.toString());
-
+                sentModel = new MessageWrapper<>(QueueStatus.BAD.toString(), null);
+                message = new MessageWrapper<>(MessageAction.UPLOAD.toString(), sentModel);
                 logger.warn("Error model is null");
-
             }
             sendMessage(mongoQueueName, message);
         } catch (Exception ex){
 
-            MessageWrapper message = new MessageWrapper(MessageAction.UPLOAD.toString(), QueueStatus.BAD.toString());
+            DocumentDTO entity = documentDTO.getPayload();
+
+            MessageWrapper<DocumentDTO> sentModel = new MessageWrapper<>(QueueStatus.BAD.toString(), entity);
+
+            MessageWrapper<MessageWrapper<DocumentDTO>> message = new MessageWrapper<>(MessageAction.UPLOAD.toString(), sentModel);
 
             logger.error("Error from receiveDocument: " + ex);
             sendMessage(mongoQueueName, message);
         }
     }
     @RabbitListener(queues = "StatusDataQueue")
-    public void receiveStatus(MessageWrapper message) {
+    public void receiveStatus(MessageWrapper<String> message) {
         try{
-            String receivedStatus = (String) message.getPayload();
+            String receivedStatus = message.getPayload();
 
             if(receivedStatus.equals(QueueStatus.DONE.toString())) {
                 logger.info("Receive status success");
             }
         } catch (Exception ex){
 
-            MessageWrapper sentMessage = new MessageWrapper(MessageAction.UPLOAD.toString(), QueueStatus.BAD.toString());
+            MessageWrapper<String> sentMessage = new MessageWrapper<>(MessageAction.UPLOAD.toString(), QueueStatus.BAD.toString());
 
             sendMessage(mongoQueueName, sentMessage);
             logger.error("Error Receive Status");
         }
     }
-        private void sendMessage(String nameQueue, MessageWrapper message){
+        private void sendMessage(String nameQueue, MessageWrapper<?> message){
         rabbitTemplate.convertAndSend(nameQueue, message);
     }
 

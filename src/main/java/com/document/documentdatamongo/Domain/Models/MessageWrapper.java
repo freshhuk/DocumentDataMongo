@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class MessageWrapper {
+public class MessageWrapper<T> {
     @JsonProperty("action")
-    private String action; // type: "add", "delete", "update" and so on
+    private String action;
     @JsonProperty("payload")
-    private Object payload;
+    private T payload;
 }
