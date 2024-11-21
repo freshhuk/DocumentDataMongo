@@ -47,6 +47,8 @@ public class DataService {
             logger.error("Error from add method" + ex);
         }
     }
+
+    public void deleteAllDocuments(){repository.deleteAll();}
     private void updateDocument(DocumentDTO doc) {
         try {
             DocumentModel document = repository.findByName(doc.getFileName());
