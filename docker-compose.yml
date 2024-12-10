@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+
+  mongomicroservice:
+    build: .
+    ports:
+      - "8080:8010"
+    environment:
+      SPRING_DATASOURCE_URL: mongodb+srv://root:root@datadb.i5m8t.mongodb.net/DataDB?retryWrites=true&w=majority&appName=DataDB
+      restart: no
